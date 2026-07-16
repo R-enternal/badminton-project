@@ -52,29 +52,81 @@
   <section id="page-home" class="page active">
     <div class="hero">
       <div class="hero-content">
+        <div class="hero-badge"><span class="pulse"></span> 12 位球友正在线</div>
         <h1 class="hero-title">
-          <span class="hero-badge">🏸</span>
-          专业羽毛球<br>从这里开始
+          今晚一起<br><span class="highlight">打球吗？</span>
         </h1>
-        <p class="hero-sub">在线预订场地 · 预约私教课程 · 选购运动装备</p>
+        <p class="hero-sub">三缺一等你来！在线约球、订场、找教练，这里有一群和你一样热爱羽毛球的人。</p>
         <div class="hero-actions">
           <button class="btn btn-primary btn-lg" onclick="navigateTo('venue')">
-            立即预订场地 →
+            看看今晚的场子 🏸
           </button>
-          <button class="btn btn-outline btn-lg" onclick="navigateTo('shop')">
-            逛逛商城
+          <button class="btn btn-outline btn-lg" onclick="navigateTo('coach')">
+            约个教练
           </button>
+        </div>
+        <div class="hero-avatars">
+          <div class="avatar-stack">
+            <div class="avatar-item">👦</div>
+            <div class="avatar-item">👧</div>
+            <div class="avatar-item">🧑</div>
+            <div class="avatar-item">👩</div>
+          </div>
+          <div class="avatar-text">已有 <strong>128 位</strong> 球友加入<br>今晚 <strong>6 场</strong> 球局可加入</div>
         </div>
         <div class="hero-stats">
           <div class="stat"><span class="stat-num" id="homeVenueCount">0</span><span class="stat-label">片场地</span></div>
           <div class="stat"><span class="stat-num" id="homeCoachCount">0</span><span class="stat-label">位教练</span></div>
-          <div class="stat"><span class="stat-num" id="homeProductCount">0</span><span class="stat-label">件商品</span></div>
+          <div class="stat"><span class="stat-num" id="homeProductCount">0</span><span class="stat-label">件装备</span></div>
         </div>
       </div>
       <div class="hero-visual">
-        <div class="hero-card card-float-1">🏸 A馆1号场<br><small>80元/小时</small></div>
-        <div class="hero-card card-float-2">🎯 张教练<br><small>成人私教</small></div>
-        <div class="hero-card card-float-3">🛒 羽毛球拍<br><small>限时特惠</small></div>
+        <div class="hero-card card-float-1">
+          🏸 今晚 20:00
+          <small>A馆1号场 · 双打缺2人</small>
+          <div class="meta">🔥 已有 2 人报名</div>
+        </div>
+        <div class="hero-card card-float-2">
+          🎯 张教练
+          <small>成人进阶 · 一对一</small>
+          <div class="meta">⭐ 4.9 分 · 本周可约</div>
+        </div>
+        <div class="hero-card card-float-3">
+          🛒 羽毛球拍特惠
+          <small>尤尼克斯入门款</small>
+          <div class="meta">💰 限时 8 折</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 球友动态 -->
+    <div class="activity-section">
+      <h3 class="activity-title">📢 球友动态</h3>
+      <div class="activity-grid">
+        <div class="activity-card">
+          <div class="activity-avatar">🏃</div>
+          <div class="activity-content">
+            <h4>阿强发起了一场球局</h4>
+            <p>今晚 20:00 · A馆1号场 · 双打 4 人局</p>
+            <div class="activity-meta"><span class="tag">缺 2 人</span><span>3 分钟前</span></div>
+          </div>
+        </div>
+        <div class="activity-card">
+          <div class="activity-avatar">👩</div>
+          <div class="activity-content">
+            <h4>小雨预约了李教练</h4>
+            <p>周六下午 · 成人进阶课 · 重点练习吊球</p>
+            <div class="activity-meta"><span class="tag">已预约</span><span>10 分钟前</span></div>
+          </div>
+        </div>
+        <div class="activity-card">
+          <div class="activity-avatar">🏆</div>
+          <div class="activity-content">
+            <h4>本周球馆之星：老王</h4>
+            <p>本周打卡 5 次，累计挥拍 3200 次，太强了！</p>
+            <div class="activity-meta"><span class="tag">热门</span><span>1 小时前</span></div>
+          </div>
+        </div>
       </div>
     </div>
 
