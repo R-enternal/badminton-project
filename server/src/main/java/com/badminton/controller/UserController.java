@@ -2,6 +2,8 @@ package com.badminton.controller;
 
 import com.badminton.common.Result;
 import com.badminton.dto.LoginDTO;
+import com.badminton.dto.PasswordLoginDTO;
+import com.badminton.dto.RegisterDTO;
 import com.badminton.service.UserService;
 import com.badminton.util.UserContext;
 import com.badminton.vo.LoginVO;
@@ -22,6 +24,24 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+
+    /**
+     * 账号密码登录
+     */
+    @Operation(summary = "账号密码登录", description = "手机号 + 密码登录")
+    @PostMapping("/login/password")
+    public Result<LoginVO> passwordLogin(@Valid @RequestBody PasswordLoginDTO loginDTO) {
+        return Result.success(userService.passwordLogin(loginDTO));
+    }
+
+    /**
+     * 用户注册
+     */
+    @Operation(summary = "用户注册", description = "手机号 + 密码注册，默认角色为 USER")
+    @PostMapping("/register")
+    public Result<LoginVO> register(@Valid @RequestBody RegisterDTO registerDTO) {
+        return Result.success(userService.register(registerDTO));
+    }
 
     /**
      * 微信登录

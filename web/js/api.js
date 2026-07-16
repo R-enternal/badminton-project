@@ -38,6 +38,8 @@ const del = (url) => request('DELETE', url);
 // ========== API 接口 ==========
 const API = {
   login: (code) => post('/user/login', { code }),
+  passwordLogin: (phone, password) => post('/user/login/password', { phone, password }),
+  register: (data) => post('/user/register', data),
   userInfo: () => get('/user/info'),
 
   // 场地

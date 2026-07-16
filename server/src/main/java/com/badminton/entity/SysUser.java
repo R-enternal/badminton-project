@@ -28,6 +28,10 @@ public class SysUser {
 
     private String phone;
 
+    private String password;
+
+    private String role;
+
     private Integer status;
 
     private LocalDateTime createTime;

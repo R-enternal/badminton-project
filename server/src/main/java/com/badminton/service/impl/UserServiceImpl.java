@@ -2,6 +2,8 @@ package com.badminton.service.impl;
 
 import com.badminton.common.BusinessException;
 import com.badminton.dto.LoginDTO;
+import com.badminton.dto.PasswordLoginDTO;
+import com.badminton.dto.RegisterDTO;
 import com.badminton.entity.SysUser;
 import com.badminton.mapper.SysUserMapper;
 import com.badminton.service.UserService;
@@ -11,14 +13,13 @@ import com.badminton.vo.UserInfoVO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
 /**
  * 用户服务实现
- * 当前为开发阶段，使用模拟微信登录（根据 code 生成 openid）
- * 上线前替换为真实微信 jscode2session 调用
  */
 @Slf4j
 @Service
@@ -27,23 +28,75 @@ public class UserServiceImpl implements UserService {
 
     private final SysUserMapper sysUserMapper;
     private final JwtUtil jwtUtil;
+    private final PasswordEncoder passwordEncoder;
+
+    @Override
+    public LoginVO passwordLogin(PasswordLoginDTO loginDTO) {
+        // 1. 根据手机号查询用户
+        SysUser user = sysUserMapper.selectOne(
+                new LambdaQueryWrapper<SysUser>()
+                        .eq(SysUser::getPhone, loginDTO.getPhone())
+        );
+
+        if (user == null) {
+            throw new BusinessException("手机号或密码错误");
+        }
+
+        if (user.getStatus() != 1) {
+            throw new BusinessException("账号已被禁用");
+        }
+
+        // 2. 校验密码
+        if (!passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
+            throw new BusinessException("手机号或密码错误");
+        }
+
+        // 3. 生成 JWT token
+        String token = jwtUtil.generateToken(user.getId(), user.getRole());
+
+        // 4. 组装返回
+        LoginVO loginVO = new LoginVO();
+        loginVO.setToken(token);
+        loginVO.setUserInfo(convertToVO(user));
+        return loginVO;
+    }
+
+    @Override
+    public LoginVO register(RegisterDTO registerDTO) {
+        // 1. 校验手机号是否已注册
+        Long count = sysUserMapper.selectCount(
+                new LambdaQueryWrapper<SysUser>()
+                        .eq(SysUser::getPhone, registerDTO.getPhone())
+        );
+        if (count != null && count > 0) {
+            throw new BusinessException("该手机号已注册");
+        }
+
+        // 2. 创建用户
+        SysUser user = new SysUser();
+        user.setPhone(registerDTO.getPhone());
+        user.setPassword(passwordEncoder.encode(registerDTO.getPassword()));
+        user.setNickname(registerDTO.getNickname() != null ? registerDTO.getNickname() : "球友" + registerDTO.getPhone().substring(7));
+        user.setRole("USER");
+        user.setStatus(1);
+        user.setCreateTime(LocalDateTime.now());
+        user.setUpdateTime(LocalDateTime.now());
+        sysUserMapper.insert(user);
+
+        // 3. 生成 JWT token
+        String token = jwtUtil.generateToken(user.getId(), user.getRole());
+
+        // 4. 组装返回
+        LoginVO loginVO = new LoginVO();
+        loginVO.setToken(token);
+        loginVO.setUserInfo(convertToVO(user));
+        return loginVO;
+    }
 
     @Override
     public LoginVO wxLogin(LoginDTO loginDTO) {
-        // ==================== 开发阶段：模拟登录 ====================
-        // 根据 code 生成一个稳定的 openid，便于测试
-        // 上线前替换为下方真实微信登录逻辑
+        // 开发阶段：根据 code 生成一个稳定的 openid，便于测试
         String openid = "test_openid_" + loginDTO.getCode().hashCode();
-
-        // ==================== 真实微信登录（上线前启用）====================
-        // String url = String.format(
-        //     "https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code",
-        //     appId, appSecret, loginDTO.getCode());
-        // JSONObject result = JSONUtil.parseObj(HttpUtil.get(url));
-        // String openid = result.getStr("openid");
-        // if (StrUtil.isBlank(openid)) {
-        //     throw new BusinessException("微信登录失败");
-        // }
 
         // 1. 根据 openid 查询或创建用户
         SysUser user = sysUserMapper.selectOne(
@@ -55,6 +108,9 @@ public class UserServiceImpl implements UserService {
             user = new SysUser();
             user.setOpenid(openid);
             user.setNickname("微信用户" + openid.substring(openid.length() - 6));
+            user.setPhone(null);
+            user.setPassword(passwordEncoder.encode(""));
+            user.setRole("USER");
             user.setStatus(1);
             user.setCreateTime(LocalDateTime.now());
             user.setUpdateTime(LocalDateTime.now());
@@ -62,7 +118,7 @@ public class UserServiceImpl implements UserService {
         }
 
         // 2. 生成 JWT token
-        String token = jwtUtil.generateToken(user.getId());
+        String token = jwtUtil.generateToken(user.getId(), user.getRole());
 
         // 3. 组装返回
         LoginVO loginVO = new LoginVO();
@@ -86,6 +142,7 @@ public class UserServiceImpl implements UserService {
         vo.setNickname(user.getNickname());
         vo.setAvatar(user.getAvatar());
         vo.setPhone(user.getPhone());
+        vo.setRole(user.getRole());
         return vo;
     }
 }

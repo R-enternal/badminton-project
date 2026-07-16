@@ -298,20 +298,34 @@
     </div>
   </section>
 
-  <!-- 登录弹窗 -->
+  <!-- 登录/注册弹窗 -->
   <div class="modal" id="loginModal">
     <div class="modal-card modal-sm">
       <div class="modal-header">
-        <h3>登录羽球馆</h3>
+        <h3 id="authTitle">登录羽球馆</h3>
         <button class="modal-close" onclick="closeModal('loginModal')">✕</button>
       </div>
       <div class="modal-body">
         <div class="login-hint">🏸</div>
-        <p style="text-align:center;color:#666;margin-bottom:20px">请输入任意登录码进行登录</p>
-        <input type="text" id="loginCode" class="form-input" placeholder="输入登录码（任意字符）" onkeyup="if(event.key==='Enter')doLogin()">
+        <div class="form-group">
+          <label>手机号</label>
+          <input type="tel" id="authPhone" class="form-input" placeholder="请输入手机号" maxlength="11">
+        </div>
+        <div class="form-group">
+          <label>密码</label>
+          <input type="password" id="authPassword" class="form-input" placeholder="请输入密码（6-20位）" onkeyup="if(event.key==='Enter')doAuth()">
+        </div>
+        <div class="form-group" id="nicknameGroup" style="display:none">
+          <label>昵称</label>
+          <input type="text" id="authNickname" class="form-input" placeholder="选填，默认球友+手机号后4位">
+        </div>
+        <div class="auth-switch">
+          <span id="authTip">还没有账号？</span>
+          <a href="#" id="authSwitch" onclick="toggleAuthMode();return false">立即注册</a>
+        </div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-primary" style="width:100%" onclick="doLogin()">立即登录</button>
+        <button class="btn btn-primary" style="width:100%" id="authBtn" onclick="doAuth()">立即登录</button>
       </div>
     </div>
   </div>

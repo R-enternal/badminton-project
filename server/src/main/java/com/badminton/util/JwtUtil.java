@@ -35,16 +35,18 @@ public class JwtUtil {
     }
 
     /**
-     * 根据用户ID生成 token
+     * 根据用户ID和角色生成 token
      *
      * @param userId 用户ID
+     * @param role   用户角色
      * @return JWT token
      */
-    public String generateToken(Long userId) {
+    public String generateToken(Long userId, String role) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + expiration);
         return Jwts.builder()
                 .subject(String.valueOf(userId))
+                .claim("role", role)
                 .issuedAt(now)
                 .expiration(expiry)
                 .signWith(key)
@@ -58,12 +60,19 @@ public class JwtUtil {
      * @return 用户ID
      */
     public Long parseUserId(String token) {
-        Claims claims = Jwts.parser()
-                .verifyWith(key)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+        Claims claims = parseClaims(token);
         return Long.valueOf(claims.getSubject());
+    }
+
+    /**
+     * 从 token 中解析用户角色
+     *
+     * @param token JWT token
+     * @return 用户角色
+     */
+    public String parseRole(String token) {
+        Claims claims = parseClaims(token);
+        return claims.get("role", String.class);
     }
 
     /**
@@ -74,14 +83,19 @@ public class JwtUtil {
      */
     public boolean validateToken(String token) {
         try {
-            Jwts.parser()
-                    .verifyWith(key)
-                    .build()
-                    .parseSignedClaims(token);
+            parseClaims(token);
             return true;
         } catch (Exception e) {
             log.warn("token 验证失败：{}", e.getMessage());
             return false;
         }
+    }
+
+    private Claims parseClaims(String token) {
+        return Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 }

@@ -57,6 +57,8 @@ function toast(msg, type = 'success') {
 }
 
 // ========== 用户 & 登录 ==========
+let authMode = 'login';
+
 function updateUserUI() {
   const user = getUser();
   document.getElementById('userName').textContent = user.nickname || '未登录';
@@ -71,23 +73,60 @@ async function updateCartBadge() {
   } catch(e) { document.getElementById('cartBadge').textContent = '0'; }
 }
 
-function showLogin() {
-  document.getElementById('loginCode').value = '';
+function showAuth(mode = 'login') {
+  authMode = mode;
+  document.getElementById('authPhone').value = '';
+  document.getElementById('authPassword').value = '';
+  document.getElementById('authNickname').value = '';
+  updateAuthUI();
   document.getElementById('loginModal').classList.add('show');
 }
 
-async function doLogin() {
-  const code = document.getElementById('loginCode').value.trim();
-  if (!code) { toast('请输入登录码', 'error'); return; }
+function updateAuthUI() {
+  const isLogin = authMode === 'login';
+  document.getElementById('authTitle').textContent = isLogin ? '登录羽球馆' : '加入羽球馆';
+  document.getElementById('authBtn').textContent = isLogin ? '立即登录' : '立即注册';
+  document.getElementById('nicknameGroup').style.display = isLogin ? 'none' : 'block';
+  document.getElementById('authTip').textContent = isLogin ? '还没有账号？' : '已有账号？';
+  document.getElementById('authSwitch').textContent = isLogin ? '立即注册' : '立即登录';
+}
+
+function toggleAuthMode() {
+  authMode = authMode === 'login' ? 'register' : 'login';
+  updateAuthUI();
+}
+
+async function doAuth() {
+  const phone = document.getElementById('authPhone').value.trim();
+  const password = document.getElementById('authPassword').value;
+  const nickname = document.getElementById('authNickname').value.trim();
+
+  if (!/^1[3-9]\d{9}$/.test(phone)) { toast('请输入正确的手机号', 'error'); return; }
+  if (password.length < 6 || password.length > 20) { toast('密码长度必须在6-20位之间', 'error'); return; }
+
+  const btn = document.getElementById('authBtn');
+  btn.disabled = true;
+  btn.textContent = authMode === 'login' ? '登录中...' : '注册中...';
+
   try {
-    const res = await API.login(code);
+    let res;
+    if (authMode === 'login') {
+      res = await API.passwordLogin(phone, password);
+    } else {
+      res = await API.register({ phone, password, nickname });
+    }
     setToken(res.token);
     setUser(res.userInfo);
     closeModal('loginModal');
     updateUserUI();
-    toast('登录成功');
+    toast(authMode === 'login' ? '登录成功' : '注册成功，欢迎加入！');
     loadPageContent(currentPage);
-  } catch(e) { toast(e.message, 'error'); }
+  } catch(e) {
+    toast(e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    updateAuthUI();
+  }
 }
 
 function logout() {
@@ -99,7 +138,7 @@ function logout() {
 }
 
 function requireLogin() {
-  if (!isLogin()) { showLogin(); return false; }
+  if (!isLogin()) { showAuth('login'); return false; }
   return true;
 }
 

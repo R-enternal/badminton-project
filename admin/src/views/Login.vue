@@ -2,16 +2,31 @@
   <div class="login-container">
     <el-card class="login-card" shadow="always">
       <template #header>
-        <div class="login-title">羽毛球馆管理系统</div>
+        <div class="login-title">🏸 羽毛球馆管理系统</div>
+        <div class="login-subtitle">管理员登录</div>
       </template>
-      <el-form :model="form" label-width="0">
-        <el-form-item>
+      <el-form :model="form" :rules="rules" ref="formRef" label-width="0">
+        <el-form-item prop="phone">
           <el-input
-            v-model="form.code"
-            placeholder="请输入任意登录码"
+            v-model="form.phone"
+            placeholder="请输入管理员手机号"
             size="large"
+            maxlength="11"
+          >
+            <template #prefix>📱</template>
+          </el-input>
+        </el-form-item>
+        <el-form-item prop="password">
+          <el-input
+            v-model="form.password"
+            type="password"
+            placeholder="请输入密码"
+            size="large"
+            show-password
             @keyup.enter="handleLogin"
-          />
+          >
+            <template #prefix>🔒</template>
+          </el-input>
         </el-form-item>
         <el-form-item>
           <el-button
@@ -39,23 +54,44 @@ import { useUserStore } from '../stores/user'
 const router = useRouter()
 const userStore = useUserStore()
 const loading = ref(false)
+const formRef = ref()
 
 const form = reactive({
-  code: 'admin'
+  phone: '',
+  password: ''
 })
 
+const rules = {
+  phone: [
+    { required: true, message: '请输入手机号', trigger: 'blur' },
+    { pattern: /^1[3-9]\d{9}$/, message: '手机号格式不正确', trigger: 'blur' }
+  ],
+  password: [
+    { required: true, message: '请输入密码', trigger: 'blur' },
+    { min: 6, max: 20, message: '密码长度必须在6-20位之间', trigger: 'blur' }
+  ]
+}
+
 const handleLogin = async () => {
-  if (!form.code) {
-    ElMessage.warning('请输入登录码')
-    return
-  }
+  const valid = await formRef.value?.validate().catch(() => false)
+  if (!valid) return
+
   loading.value = true
   try {
-    const res = await userApi.login(form.code)
+    const res = await userApi.passwordLogin(form.phone, form.password)
+
+    // 校验角色权限，只有 ADMIN 能进入管理后台
+    if (res.userInfo.role !== 'ADMIN') {
+      ElMessage.error('当前账号无管理员权限')
+      return
+    }
+
     userStore.setToken(res.token)
     userStore.setUserInfo(res.userInfo)
     ElMessage.success('登录成功')
     router.push('/')
+  } catch (err) {
+    ElMessage.error(err.message || '登录失败')
   } finally {
     loading.value = false
   }
@@ -68,17 +104,25 @@ const handleLogin = async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f3f4f6;
+  background: linear-gradient(135deg, #fffaf5 0%, #ffedd5 100%);
 }
 
 .login-card {
-  width: 400px;
+  width: 420px;
+  border-radius: 20px;
 }
 
 .login-title {
   text-align: center;
-  font-size: 20px;
-  font-weight: bold;
-  color: #303133;
+  font-size: 22px;
+  font-weight: 800;
+  color: #451a03;
+}
+
+.login-subtitle {
+  text-align: center;
+  font-size: 14px;
+  color: #92400e;
+  margin-top: 8px;
 }
 </style>

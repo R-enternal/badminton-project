@@ -35,7 +35,9 @@ public class LoginInterceptor implements HandlerInterceptor {
         }
 
         Long userId = jwtUtil.parseUserId(token);
+        String role = jwtUtil.parseRole(token);
         UserContext.setUserId(userId);
+        UserContext.setRole(role);
         return true;
     }
 

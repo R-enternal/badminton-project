@@ -14,18 +14,21 @@ USE badminton_db;
 -- 1. 用户表
 CREATE TABLE IF NOT EXISTS sys_user (
     id BIGINT NOT NULL AUTO_INCREMENT COMMENT '用户ID',
-    openid VARCHAR(64) NOT NULL COMMENT '微信openid',
+    openid VARCHAR(64) DEFAULT NULL COMMENT '微信openid（后期微信登录时填充）',
     unionid VARCHAR(64) DEFAULT NULL COMMENT '微信unionid',
     nickname VARCHAR(64) DEFAULT NULL COMMENT '昵称',
     avatar VARCHAR(255) DEFAULT NULL COMMENT '头像URL',
-    phone VARCHAR(20) DEFAULT NULL COMMENT '手机号',
+    phone VARCHAR(20) DEFAULT NULL COMMENT '手机号，作为登录账号',
+    password VARCHAR(128) NOT NULL DEFAULT '' COMMENT 'BCrypt加密密码',
+    role VARCHAR(32) NOT NULL DEFAULT 'USER' COMMENT '角色：USER/ADMIN/COACH',
     status TINYINT NOT NULL DEFAULT 1 COMMENT '状态：0禁用 1启用',
     create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     update_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     deleted TINYINT NOT NULL DEFAULT 0 COMMENT '是否删除：0否 1是',
     PRIMARY KEY (id),
     UNIQUE KEY uk_openid (openid),
-    KEY idx_phone (phone),
+    UNIQUE KEY uk_phone (phone),
+    KEY idx_role (role),
     KEY idx_create_time (create_time)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户表';
 
