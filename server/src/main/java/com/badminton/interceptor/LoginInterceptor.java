@@ -1,7 +1,9 @@
 package com.badminton.interceptor;
 
+import com.badminton.common.Result;
 import com.badminton.util.JwtUtil;
 import com.badminton.util.UserContext;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +13,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 /**
  * 登录拦截器
- * 校验请求头中的 JWT token，并将 userId 存入 ThreadLocal
+ * 校验请求头中的 JWT token，并将 userId/role 存入 ThreadLocal
  */
 @Slf4j
 @Component
@@ -19,19 +21,20 @@ import org.springframework.web.servlet.HandlerInterceptor;
 public class LoginInterceptor implements HandlerInterceptor {
 
     private final JwtUtil jwtUtil;
+    private final ObjectMapper objectMapper;
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String token = request.getHeader("Authorization");
         if (token == null || !token.startsWith("Bearer ")) {
-            response.setStatus(401);
-            throw new RuntimeException("请先登录");
+            writeUnauthorized(response, "请先登录");
+            return false;
         }
 
         token = token.substring(7);
         if (!jwtUtil.validateToken(token)) {
-            response.setStatus(401);
-            throw new RuntimeException("登录已过期，请重新登录");
+            writeUnauthorized(response, "登录已过期，请重新登录");
+            return false;
         }
 
         Long userId = jwtUtil.parseUserId(token);
@@ -39,6 +42,13 @@ public class LoginInterceptor implements HandlerInterceptor {
         UserContext.setUserId(userId);
         UserContext.setRole(role);
         return true;
+    }
+
+    private void writeUnauthorized(HttpServletResponse response, String message) throws Exception {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json;charset=UTF-8");
+        response.getWriter().write(objectMapper.writeValueAsString(Result.error(401, message)));
+        response.getWriter().flush();
     }
 
     @Override

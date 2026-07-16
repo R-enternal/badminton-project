@@ -1,6 +1,7 @@
 package com.badminton.controller;
 
 import com.badminton.common.Result;
+import com.badminton.annotation.RequireRole;
 import com.badminton.dto.CoachBookingDTO;
 import com.badminton.dto.CoachDTO;
 import com.badminton.dto.CoachCourseDTO;
@@ -49,12 +50,14 @@ public class CoachController {
     // ==================== 教练管理 ====================
 
     @Operation(summary = "新增教练")
+    @RequireRole("ADMIN")
     @PostMapping
     public Result<Long> createCoach(@Valid @RequestBody CoachDTO dto) {
         return Result.success(coachService.createCoach(dto));
     }
 
     @Operation(summary = "修改教练")
+    @RequireRole("ADMIN")
     @PutMapping("/{id}")
     public Result<Void> updateCoach(@PathVariable Long id, @Valid @RequestBody CoachDTO dto) {
         dto.setId(id);
@@ -63,6 +66,7 @@ public class CoachController {
     }
 
     @Operation(summary = "删除教练")
+    @RequireRole("ADMIN")
     @DeleteMapping("/{id}")
     public Result<Void> deleteCoach(@PathVariable Long id) {
         coachService.deleteCoach(id);
@@ -76,6 +80,7 @@ public class CoachController {
     }
 
     @Operation(summary = "教练列表", description = "管理后台使用，包含禁用状态")
+    @RequireRole("ADMIN")
     @GetMapping("/list")
     public Result<List<CoachVO>> listCoaches() {
         return Result.success(coachService.listAllCoaches());
@@ -90,12 +95,14 @@ public class CoachController {
     // ==================== 课程管理 ====================
 
     @Operation(summary = "新增课程")
+    @RequireRole("ADMIN")
     @PostMapping("/course")
     public Result<Long> createCourse(@Valid @RequestBody CoachCourseDTO dto) {
         return Result.success(coachCourseService.createCourse(dto));
     }
 
     @Operation(summary = "修改课程")
+    @RequireRole("ADMIN")
     @PutMapping("/course/{id}")
     public Result<Void> updateCourse(@PathVariable Long id, @Valid @RequestBody CoachCourseDTO dto) {
         dto.setId(id);
@@ -104,6 +111,7 @@ public class CoachController {
     }
 
     @Operation(summary = "删除课程")
+    @RequireRole("ADMIN")
     @DeleteMapping("/course/{id}")
     public Result<Void> deleteCourse(@PathVariable Long id) {
         coachCourseService.deleteCourse(id);
@@ -125,12 +133,14 @@ public class CoachController {
     // ==================== 排班管理 ====================
 
     @Operation(summary = "新增排班")
+    @RequireRole("ADMIN")
     @PostMapping("/schedule")
     public Result<Long> createSchedule(@Valid @RequestBody CoachScheduleDTO dto) {
         return Result.success(coachScheduleService.createSchedule(dto));
     }
 
     @Operation(summary = "修改排班")
+    @RequireRole("ADMIN")
     @PutMapping("/schedule/{id}")
     public Result<Void> updateSchedule(@PathVariable Long id, @Valid @RequestBody CoachScheduleDTO dto) {
         dto.setId(id);
@@ -139,6 +149,7 @@ public class CoachController {
     }
 
     @Operation(summary = "删除排班")
+    @RequireRole("ADMIN")
     @DeleteMapping("/schedule/{id}")
     public Result<Void> deleteSchedule(@PathVariable Long id) {
         coachScheduleService.deleteSchedule(id);

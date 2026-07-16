@@ -1,6 +1,7 @@
 package com.badminton.controller;
 
 import com.badminton.common.Result;
+import com.badminton.annotation.RequireRole;
 import com.badminton.dto.VenueDTO;
 import com.badminton.service.VenueService;
 import com.badminton.service.VenueSlotService;
@@ -49,12 +50,14 @@ public class VenueController {
     }
 
     @Operation(summary = "新增场地")
+    @RequireRole("ADMIN")
     @PostMapping
     public Result<Long> create(@Valid @RequestBody VenueDTO dto) {
         return Result.success(venueService.createVenue(dto));
     }
 
     @Operation(summary = "修改场地")
+    @RequireRole("ADMIN")
     @PutMapping("/{id}")
     public Result<Void> update(@PathVariable Long id, @Valid @RequestBody VenueDTO dto) {
         dto.setId(id);
@@ -63,6 +66,7 @@ public class VenueController {
     }
 
     @Operation(summary = "删除场地")
+    @RequireRole("ADMIN")
     @DeleteMapping("/{id}")
     public Result<Void> delete(@PathVariable Long id) {
         venueService.deleteVenue(id);
@@ -81,6 +85,7 @@ public class VenueController {
     }
 
     @Operation(summary = "生成场地时段")
+    @RequireRole("ADMIN")
     @PostMapping("/slots/generate")
     public Result<Void> generateSlots(
             @RequestParam(required = false) Long venueId,

@@ -1,3 +1,8 @@
+// ========== 校验常量（与后端 ValidationConstants 保持一致） ==========
+const PHONE_REGEX = /^1[3-9]\d{9}$/;
+const PASSWORD_MIN = 6;
+const PASSWORD_MAX = 20;
+
 // ========== 路由 & 全局状态 ==========
 let currentPage = 'home';
 let currentVenueSlot = null;
@@ -101,8 +106,8 @@ async function doAuth() {
   const password = document.getElementById('authPassword').value;
   const nickname = document.getElementById('authNickname').value.trim();
 
-  if (!/^1[3-9]\d{9}$/.test(phone)) { toast('请输入正确的手机号', 'error'); return; }
-  if (password.length < 6 || password.length > 20) { toast('密码长度必须在6-20位之间', 'error'); return; }
+  if (!PHONE_REGEX.test(phone)) { toast('请输入正确的手机号', 'error'); return; }
+  if (password.length < PASSWORD_MIN || password.length > PASSWORD_MAX) { toast('密码长度必须在6-20位之间', 'error'); return; }
 
   const btn = document.getElementById('authBtn');
   btn.disabled = true;

@@ -74,6 +74,12 @@ jwt:
   secret: your-256-bit-secret-key-for-jwt-signing-must-be-at-least-32-characters
   expiration: 604800000  # 7天，单位毫秒
 
+# 默认管理员配置（生产环境请通过环境变量覆盖，切勿使用默认密码）
+admin:
+  default:
+    phone: ${DEFAULT_ADMIN_PHONE:13800138000}
+    password: ${DEFAULT_ADMIN_PASSWORD:}
+
 # 微信支付配置（开发阶段为占位符，上线前替换）
 wechat:
   miniapp:
