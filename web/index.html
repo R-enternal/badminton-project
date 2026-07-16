@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>羽球馆 - 在线预订</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- 导航栏 -->
+<nav class="navbar" id="navbar">
+  <div class="nav-inner">
+    <a href="#home" class="logo">
+      <span class="logo-icon">🏸</span>
+      <span>羽球馆</span>
+    </a>
+    <div class="nav-links">
+      <a href="#home" class="nav-link active">首页</a>
+      <a href="#venue" class="nav-link">场地预约</a>
+      <a href="#coach" class="nav-link">私教课程</a>
+      <a href="#shop" class="nav-link">商城</a>
+      <a href="#cart" class="nav-link" id="cartLink">
+        购物车 <span class="cart-badge" id="cartBadge">0</span>
+      </a>
+    </div>
+    <div class="nav-actions">
+      <span class="user-area" id="userBtn" onclick="toggleUserMenu()">
+        <span class="avatar">👤</span>
+        <span id="userName">未登录</span>
+      </span>
+      <div class="user-menu" id="userMenu">
+        <a href="#orders" onclick="closeUserMenu()">我的订单</a>
+        <a href="#" onclick="logout();closeUserMenu()">退出登录</a>
+      </div>
+    </div>
+    <button class="menu-toggle" onclick="toggleMobileMenu()">☰</button>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#home" onclick="closeMobileMenu()">首页</a>
+    <a href="#venue" onclick="closeMobileMenu()">场地预约</a>
+    <a href="#coach" onclick="closeMobileMenu()">私教课程</a>
+    <a href="#shop" onclick="closeMobileMenu()">商城</a>
+    <a href="#cart" onclick="closeMobileMenu()">购物车</a>
+    <a href="#orders" onclick="closeMobileMenu()">我的订单</a>
+  </div>
+</nav>
+
+<!-- 页面容器 -->
+<main id="app">
+  <!-- 首页 -->
+  <section id="page-home" class="page active">
+    <div class="hero">
+      <div class="hero-content">
+        <h1 class="hero-title">
+          <span class="hero-badge">🏸</span>
+          专业羽毛球<br>从这里开始
+        </h1>
+        <p class="hero-sub">在线预订场地 · 预约私教课程 · 选购运动装备</p>
+        <div class="hero-actions">
+          <button class="btn btn-primary btn-lg" onclick="navigateTo('venue')">
+            立即预订场地 →
+          </button>
+          <button class="btn btn-outline btn-lg" onclick="navigateTo('shop')">
+            逛逛商城
+          </button>
+        </div>
+        <div class="hero-stats">
+          <div class="stat"><span class="stat-num" id="homeVenueCount">0</span><span class="stat-label">片场地</span></div>
+          <div class="stat"><span class="stat-num" id="homeCoachCount">0</span><span class="stat-label">位教练</span></div>
+          <div class="stat"><span class="stat-num" id="homeProductCount">0</span><span class="stat-label">件商品</span></div>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-card card-float-1">🏸 A馆1号场<br><small>80元/小时</small></div>
+        <div class="hero-card card-float-2">🎯 张教练<br><small>成人私教</small></div>
+        <div class="hero-card card-float-3">🛒 羽毛球拍<br><small>限时特惠</small></div>
+      </div>
+    </div>
+
+    <!-- 快捷入口 -->
+    <div class="section">
+      <h2 class="section-title">快速预约</h2>
+      <div class="quick-grid">
+        <div class="quick-card" onclick="navigateTo('venue')">
+          <div class="quick-icon">🏟️</div>
+          <h3>场地预约</h3>
+          <p>按小时预约，实时查看占用</p>
+        </div>
+        <div class="quick-card" onclick="navigateTo('coach')">
+          <div class="quick-icon">👨‍🏫</div>
+          <h3>私教课程</h3>
+          <p>专业教练一对一指导</p>
+        </div>
+        <div class="quick-card" onclick="navigateTo('shop')">
+          <div class="quick-icon">🏪</div>
+          <h3>运动商城</h3>
+          <p>装备器材一站购齐</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 场地预约页 -->
+  <section id="page-venue" class="page">
+    <div class="page-header">
+      <h2>🏟️ 场地预约</h2>
+      <p>选择日期和时段，快速预订羽毛球场</p>
+    </div>
+    <div class="date-bar">
+      <button class="date-arrow" onclick="changeDate(-1)">‹</button>
+      <div class="date-scroll" id="dateScroll"></div>
+      <button class="date-arrow" onclick="changeDate(1)">›</button>
+    </div>
+    <div class="venue-grid" id="venueList">
+      <div class="loading">加载中...</div>
+    </div>
+    <!-- 预约确认弹窗 -->
+    <div class="modal" id="venueModal">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3>确认预约</h3>
+          <button class="modal-close" onclick="closeModal('venueModal')">✕</button>
+        </div>
+        <div class="modal-body" id="venueModalBody"></div>
+        <div class="modal-footer">
+          <button class="btn btn-outline" onclick="closeModal('venueModal')">取消</button>
+          <button class="btn btn-primary" id="venueConfirmBtn" onclick="confirmVenueBooking()">确认预约</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 教练课程页 -->
+  <section id="page-coach" class="page">
+    <div class="page-header">
+      <h2>👨‍🏫 私教课程</h2>
+      <p>专业教练，助你提升球技</p>
+    </div>
+    <div class="coach-grid" id="coachList">
+      <div class="loading">加载中...</div>
+    </div>
+    <!-- 教练详情弹窗 -->
+    <div class="modal" id="coachModal">
+      <div class="modal-card modal-lg">
+        <div class="modal-header">
+          <h3 id="coachModalTitle">教练详情</h3>
+          <button class="modal-close" onclick="closeModal('coachModal')">✕</button>
+        </div>
+        <div class="modal-body" id="coachModalBody"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 商城页 -->
+  <section id="page-shop" class="page">
+    <div class="page-header">
+      <h2>🏪 运动商城</h2>
+      <div class="shop-controls">
+        <select id="categoryFilter" class="form-select" onchange="loadProducts()">
+          <option value="">全部分类</option>
+        </select>
+        <input type="text" id="productSearch" class="form-input" placeholder="搜索商品..." onkeyup="loadProducts()">
+      </div>
+    </div>
+    <div class="product-grid" id="productList">
+      <div class="loading">加载中...</div>
+    </div>
+    <!-- 商品详情弹窗 -->
+    <div class="modal" id="productModal">
+      <div class="modal-card modal-lg">
+        <div class="modal-header">
+          <h3 id="productModalTitle">商品详情</h3>
+          <button class="modal-close" onclick="closeModal('productModal')">✕</button>
+        </div>
+        <div class="modal-body" id="productModalBody"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 购物车页 -->
+  <section id="page-cart" class="page">
+    <div class="page-header">
+      <h2>🛒 购物车</h2>
+    </div>
+    <div id="cartList">
+      <div class="loading">加载中...</div>
+    </div>
+    <div class="cart-footer" id="cartFooter" style="display:none">
+      <div class="cart-summary">
+        <label class="select-all"><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"> 全选</label>
+        <span>合计: <strong id="cartTotal">¥0.00</strong></span>
+        <button class="btn btn-primary" onclick="checkout()">去结算</button>
+      </div>
+    </div>
+    <!-- 结算弹窗 -->
+    <div class="modal" id="checkoutModal">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3>确认订单</h3>
+          <button class="modal-close" onclick="closeModal('checkoutModal')">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>收货人</label>
+            <input type="text" id="receiverName" class="form-input" placeholder="请输入收货人姓名">
+          </div>
+          <div class="form-group">
+            <label>收货电话</label>
+            <input type="text" id="receiverPhone" class="form-input" placeholder="请输入收货电话">
+          </div>
+          <div class="form-group">
+            <label>收货地址</label>
+            <input type="text" id="receiverAddress" class="form-input" placeholder="请输入收货地址">
+          </div>
+          <div class="form-group">
+            <label>备注</label>
+            <input type="text" id="orderRemark" class="form-input" placeholder="选填">
+          </div>
+          <div class="order-summary">
+            <span>应付金额: <strong id="checkoutTotal">¥0.00</strong></span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline" onclick="closeModal('checkoutModal')">取消</button>
+          <button class="btn btn-primary" onclick="confirmOrder()">提交订单</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 我的订单页 -->
+  <section id="page-orders" class="page">
+    <div class="page-header">
+      <h2>📋 我的订单</h2>
+      <div class="order-tabs" id="orderTabs">
+        <button class="tab active" data-status="" onclick="loadOrders()">全部</button>
+        <button class="tab" data-status="0" onclick="loadOrders(0)">待付款</button>
+        <button class="tab" data-status="1" onclick="loadOrders(1)">已付款</button>
+        <button class="tab" data-status="2" onclick="loadOrders(2)">已发货</button>
+        <button class="tab" data-status="4" onclick="loadOrders(4)">已完成</button>
+      </div>
+    </div>
+    <div id="orderList">
+      <div class="loading">加载中...</div>
+    </div>
+  </section>
+
+  <!-- 登录弹窗 -->
+  <div class="modal" id="loginModal">
+    <div class="modal-card modal-sm">
+      <div class="modal-header">
+        <h3>登录羽球馆</h3>
+        <button class="modal-close" onclick="closeModal('loginModal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="login-hint">🏸</div>
+        <p style="text-align:center;color:#666;margin-bottom:20px">请输入任意登录码进行登录</p>
+        <input type="text" id="loginCode" class="form-input" placeholder="输入登录码（任意字符）" onkeyup="if(event.key==='Enter')doLogin()">
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" style="width:100%" onclick="doLogin()">立即登录</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
