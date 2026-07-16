@@ -151,6 +151,7 @@ function requireLogin() {
 function closeModal(id) { document.getElementById(id).classList.remove('show'); }
 
 function toggleUserMenu() {
+  if (!isLogin()) { showAuth('login'); return; }
   document.getElementById('userMenu').classList.toggle('show');
 }
 function closeUserMenu() { document.getElementById('userMenu').classList.remove('show'); }

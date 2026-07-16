@@ -31,6 +31,14 @@ public class JwtUtil {
     @PostConstruct
     public void init() {
         // 使用 HMAC-SHA256 密钥，必须至少 256 位（32 字符）
+        if (secret == null || secret.length() < 32) {
+            throw new IllegalArgumentException("JWT 密钥长度必须至少 32 个字符，请通过环境变量 JWT_SECRET 配置");
+        }
+        if ("your-256-bit-secret-key-for-jwt-signing-must-be-at-least-32-characters".equals(secret)) {
+            log.warn("========================================");
+            log.warn("正在使用默认 JWT 密钥，生产环境请务必通过环境变量 JWT_SECRET 覆盖");
+            log.warn("========================================");
+        }
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 

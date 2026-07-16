@@ -23,8 +23,12 @@ async function request(method, path, data) {
   if (json.code === 401) {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    if (!path.includes('/user/login')) showLogin();
+    if (!path.includes('/user/login')) showAuth();
     throw new Error('请先登录');
+  }
+  if (json.code === 403) {
+    toast(json.message || '无权限访问', 'error');
+    throw new Error(json.message || '无权限访问');
   }
   if (json.code !== 200) throw new Error(json.message || '请求失败');
   return json.data;

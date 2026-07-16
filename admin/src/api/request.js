@@ -24,11 +24,15 @@ request.interceptors.response.use(
   (response) => {
     const res = response.data
     if (res.code !== 200) {
-      ElMessage.error(res.message || '请求失败')
       if (res.code === 401) {
+        ElMessage.error(res.message || '登录已过期，请重新登录')
         const userStore = useUserStore()
         userStore.logout()
         window.location.href = '/login'
+      } else if (res.code === 403) {
+        ElMessage.error(res.message || '无权限访问')
+      } else {
+        ElMessage.error(res.message || '请求失败')
       }
       return Promise.reject(new Error(res.message))
     }
