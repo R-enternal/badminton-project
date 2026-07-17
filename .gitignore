@@ -16,3 +16,9 @@ Thumbs.db
 
 # 本地环境文件
 .env.local
+
+# 质量闸门生成的通行证和报告（不要提交）
+.quality-gate-pass
+.quality-review-pass
+.quality-review-report.md
+.push-pass

@@ -149,7 +149,37 @@ export JWT_SECRET=your-256-bit-secret-key-at-least-32-characters-long
 
 ---
 
-## 5. 核心模块接口
+## 5. 质量闸门（Quality Gate）
+
+在 `git commit` / `git push` / `git merge` 之前，必须通过质量闸门 `/quality-gate`。
+
+### 5.1 闸门检查内容
+
+1. **server 单元测试**：`mvn test -q`
+2. **admin 构建检查**：`npm run build`
+3. **代码质量审查**：公共方法注释、魔法数字、输入校验、并发安全等
+
+### 5.2 使用流程
+
+```bash
+# 1. 修改代码后，运行质量闸门
+/quality-gate
+
+# 2. 通过后生成 .quality-gate-pass 通行证
+
+# 3. 执行 git commit / push / merge
+# git-executor 会自动检查通行证
+```
+
+### 5.3 通行证规则
+
+- `.quality-gate-pass` 绑定到当前 `HEAD` commit hash
+- 修改代码后旧通行证自动失效
+- 该文件已加入 `.gitignore`，不会提交到仓库
+
+---
+
+## 6. 核心模块接口
 
 ### 5.1 用户模块
 
@@ -217,7 +247,7 @@ export JWT_SECRET=your-256-bit-secret-key-at-least-32-characters-long
 
 ---
 
-## 6. 部署配置
+## 7. 部署配置
 
 ### 6.1 环境变量
 
@@ -243,7 +273,7 @@ export JWT_SECRET=your-256-bit-secret-key-at-least-32-characters-long
 
 ---
 
-## 7. 开发团队
+## 8. 开发团队
 
 - 项目代码统一放在 `D:\AI Program\badminton-project`
 - 远程仓库：https://github.com/R-enternal/badminton-project
