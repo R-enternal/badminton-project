@@ -31,7 +31,8 @@
       </span>
       <div class="user-menu" id="userMenu">
         <a href="#orders" onclick="closeUserMenu()">我的订单</a>
-        <a href="#" onclick="logout();closeUserMenu()">退出登录</a>
+        <a href="#" onclick="showChangePassword();closeUserMenu();return false">修改密码</a>
+        <a href="#" onclick="logout();closeUserMenu();return false">退出登录</a>
       </div>
     </div>
     <button class="menu-toggle" onclick="toggleMobileMenu()">☰</button>
@@ -326,6 +327,33 @@
       </div>
       <div class="modal-footer">
         <button class="btn btn-primary" style="width:100%" id="authBtn" onclick="doAuth()">立即登录</button>
+      </div>
+    </div>
+  </div>
+  <!-- 修改密码弹窗 -->
+  <div class="modal" id="changePasswordModal">
+    <div class="modal-card modal-sm">
+      <div class="modal-header">
+        <h3>修改密码</h3>
+        <button class="modal-close" onclick="closeModal('changePasswordModal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="login-hint">🔒</div>
+        <div class="form-group">
+          <label>旧密码</label>
+          <input type="password" id="cpOld" class="form-input" placeholder="请输入旧密码">
+        </div>
+        <div class="form-group">
+          <label>新密码</label>
+          <input type="password" id="cpNew" class="form-input" placeholder="请输入新密码（6-20位）">
+        </div>
+        <div class="form-group">
+          <label>确认密码</label>
+          <input type="password" id="cpConfirm" class="form-input" placeholder="请再次输入新密码" onkeyup="if(event.key==='Enter')doChangePassword()">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" style="width:100%" onclick="doChangePassword()">确认修改</button>
       </div>
     </div>
   </div>

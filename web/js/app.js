@@ -142,6 +142,39 @@ function logout() {
   navigateTo('home');
 }
 
+function showChangePassword() {
+  if (!isLogin()) { showAuth('login'); return; }
+  document.getElementById('cpOld').value = '';
+  document.getElementById('cpNew').value = '';
+  document.getElementById('cpConfirm').value = '';
+  document.getElementById('changePasswordModal').classList.add('show');
+}
+
+async function doChangePassword() {
+  const oldPassword = document.getElementById('cpOld').value;
+  const newPassword = document.getElementById('cpNew').value;
+  const confirmPassword = document.getElementById('cpConfirm').value;
+
+  if (oldPassword.length < PASSWORD_MIN || oldPassword.length > PASSWORD_MAX) { toast('旧密码长度必须在6-20位之间', 'error'); return; }
+  if (newPassword.length < PASSWORD_MIN || newPassword.length > PASSWORD_MAX) { toast('新密码长度必须在6-20位之间', 'error'); return; }
+  if (newPassword !== confirmPassword) { toast('两次输入的密码不一致', 'error'); return; }
+
+  const btn = document.querySelector('#changePasswordModal .btn-primary');
+  btn.disabled = true;
+  btn.textContent = '修改中...';
+  try {
+    await API.changePassword({ oldPassword, newPassword });
+    toast('密码修改成功，请重新登录', 'success');
+    closeModal('changePasswordModal');
+    logout();
+  } catch(e) {
+    // 错误已在 request 中提示
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '确认修改';
+  }
+}
+
 function requireLogin() {
   if (!isLogin()) { showAuth('login'); return false; }
   return true;

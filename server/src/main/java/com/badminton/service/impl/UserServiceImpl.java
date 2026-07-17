@@ -1,6 +1,7 @@
 package com.badminton.service.impl;
 
 import com.badminton.common.BusinessException;
+import com.badminton.dto.ChangePasswordDTO;
 import com.badminton.dto.LoginDTO;
 import com.badminton.dto.PasswordLoginDTO;
 import com.badminton.dto.RegisterDTO;
@@ -134,6 +135,26 @@ public class UserServiceImpl implements UserService {
             throw new BusinessException("用户不存在");
         }
         return convertToVO(user);
+    }
+
+    @Override
+    public void changePassword(Long userId, ChangePasswordDTO dto) {
+        SysUser user = sysUserMapper.selectById(userId);
+        if (user == null) {
+            throw new BusinessException("用户不存在");
+        }
+        if (user.getStatus() != 1) {
+            throw new BusinessException("账号已被禁用");
+        }
+        if (!passwordEncoder.matches(dto.getOldPassword(), user.getPassword())) {
+            throw new BusinessException("旧密码错误");
+        }
+        if (passwordEncoder.matches(dto.getNewPassword(), user.getPassword())) {
+            throw new BusinessException("新密码不能与旧密码相同");
+        }
+        user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+        user.setUpdateTime(LocalDateTime.now());
+        sysUserMapper.updateById(user);
     }
 
     private UserInfoVO convertToVO(SysUser user) {

@@ -171,12 +171,14 @@ public class CoachController {
     // ==================== 课程预约 ====================
 
     @Operation(summary = "预约私教课程")
+    @RequireRole({"USER", "COACH"})
     @PostMapping("/book")
     public Result<CoachBookingVO> book(@Valid @RequestBody CoachBookingDTO dto) {
         return Result.success(coachBookingService.prepareBooking(UserContext.getUserId(), dto));
     }
 
     @Operation(summary = "取消课程预约")
+    @RequireRole({"USER", "COACH"})
     @PostMapping("/book/cancel/{id}")
     public Result<Void> cancelBook(@PathVariable Long id) {
         coachBookingService.cancelBooking(UserContext.getUserId(), id);
@@ -184,6 +186,7 @@ public class CoachController {
     }
 
     @Operation(summary = "我的课程预约")
+    @RequireRole({"USER", "COACH"})
     @GetMapping("/book/my")
     public Result<List<CoachBookingVO>> myBooks(@RequestParam(required = false) Integer status) {
         return Result.success(coachBookingService.listMyBookings(UserContext.getUserId(), status));

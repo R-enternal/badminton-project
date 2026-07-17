@@ -1,6 +1,7 @@
 package com.badminton.controller;
 
 import com.badminton.common.Result;
+import com.badminton.dto.ChangePasswordDTO;
 import com.badminton.dto.LoginDTO;
 import com.badminton.dto.PasswordLoginDTO;
 import com.badminton.dto.RegisterDTO;
@@ -68,6 +69,16 @@ public class UserController {
     @PostMapping("/logout")
     public Result<Void> logout() {
         // token 无状态，退出时前端删除即可
+        return Result.success();
+    }
+
+    /**
+     * 修改密码
+     */
+    @Operation(summary = "修改密码")
+    @PutMapping("/password")
+    public Result<Void> changePassword(@Valid @RequestBody ChangePasswordDTO dto) {
+        userService.changePassword(UserContext.getUserId(), dto);
         return Result.success();
     }
 }

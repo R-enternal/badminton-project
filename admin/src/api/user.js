@@ -4,5 +4,6 @@ export const userApi = {
   login: (code) => request.post('/user/login', { code }),
   passwordLogin: (phone, password) => request.post('/user/login/password', { phone, password }),
   register: (data) => request.post('/user/register', data),
-  info: () => request.get('/user/info')
+  info: () => request.get('/user/info'),
+  changePassword: (data) => request.put('/user/password', data)
 }

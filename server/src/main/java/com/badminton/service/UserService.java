@@ -1,5 +1,6 @@
 package com.badminton.service;
 
+import com.badminton.dto.ChangePasswordDTO;
 import com.badminton.dto.LoginDTO;
 import com.badminton.dto.PasswordLoginDTO;
 import com.badminton.dto.RegisterDTO;
@@ -42,4 +43,11 @@ public interface UserService {
      * @return 用户信息
      */
     UserInfoVO getUserInfo(Long userId);
+    /**
+     * 修改密码
+     *
+     * @param userId 用户ID
+     * @param dto    密码参数
+     */
+    void changePassword(Long userId, ChangePasswordDTO dto);
 }
