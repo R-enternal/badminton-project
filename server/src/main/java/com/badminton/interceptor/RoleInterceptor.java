@@ -1,9 +1,12 @@
 package com.badminton.interceptor;
 
 import com.badminton.annotation.RequireRole;
+import com.badminton.common.Result;
 import com.badminton.util.UserContext;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
@@ -17,7 +20,10 @@ import java.util.Arrays;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class RoleInterceptor implements HandlerInterceptor {
+
+    private final ObjectMapper objectMapper;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -33,16 +39,23 @@ public class RoleInterceptor implements HandlerInterceptor {
 
         String currentRole = UserContext.getRole();
         if (currentRole == null) {
-            response.setStatus(403);
-            throw new RuntimeException("无权访问");
+            writeForbidden(response, "无权访问");
+            return false;
         }
 
         boolean allowed = Arrays.asList(requireRole.value()).contains(currentRole);
         if (!allowed) {
-            response.setStatus(403);
-            throw new RuntimeException("当前角色无权访问该接口");
+            writeForbidden(response, "当前角色无权访问该接口");
+            return false;
         }
 
         return true;
+    }
+
+    private void writeForbidden(HttpServletResponse response, String message) throws Exception {
+        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        response.setContentType("application/json;charset=UTF-8");
+        response.getWriter().write(objectMapper.writeValueAsString(Result.error(403, message)));
+        response.getWriter().flush();
     }
 }

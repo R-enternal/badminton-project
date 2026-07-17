@@ -5,9 +5,11 @@ import com.badminton.mapper.SysUserMapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 
@@ -23,6 +25,12 @@ public class SystemInitRunner implements CommandLineRunner {
     private final SysUserMapper sysUserMapper;
     private final PasswordEncoder passwordEncoder;
 
+    @Value("${admin.default.phone:13800138000}")
+    private String defaultAdminPhone;
+
+    @Value("${admin.default.password:}")
+    private String defaultAdminPassword;
+
     @Override
     public void run(String... args) {
         Long adminCount = sysUserMapper.selectCount(
@@ -32,9 +40,17 @@ public class SystemInitRunner implements CommandLineRunner {
             return;
         }
 
+        if (!StringUtils.hasText(defaultAdminPassword)) {
+            log.warn("========================================");
+            log.warn("系统中没有管理员，但未配置默认管理员密码");
+            log.warn("请设置环境变量 DEFAULT_ADMIN_PASSWORD 后重启");
+            log.warn("========================================");
+            return;
+        }
+
         SysUser admin = new SysUser();
-        admin.setPhone("13800138000");
-        admin.setPassword(passwordEncoder.encode("admin123"));
+        admin.setPhone(defaultAdminPhone);
+        admin.setPassword(passwordEncoder.encode(defaultAdminPassword));
         admin.setNickname("超级管理员");
         admin.setRole("ADMIN");
         admin.setStatus(1);
@@ -44,8 +60,7 @@ public class SystemInitRunner implements CommandLineRunner {
 
         log.info("========================================");
         log.info("已创建默认管理员账号");
-        log.info("手机号：13800138000");
-        log.info("密码：admin123");
+        log.info("手机号：{}", defaultAdminPhone);
         log.info("========================================");
     }
 }

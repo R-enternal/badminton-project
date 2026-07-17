@@ -79,11 +79,18 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const userStore = useUserStore()
+  // 未登录且访问非公开页，跳转登录
   if (!to.meta.public && !userStore.token) {
     next('/login')
-  } else {
-    next()
+    return
   }
+  // 已登录但非管理员角色访问后台，清空登录态并跳转登录
+  if (!to.meta.public && userStore.userInfo?.role !== 'ADMIN') {
+    userStore.logout()
+    next('/login')
+    return
+  }
+  next()
 })
 
 export default router

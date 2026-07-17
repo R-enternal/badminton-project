@@ -50,6 +50,7 @@ import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { userApi } from '../api/user'
 import { useUserStore } from '../stores/user'
+import { passwordRule, phoneRule } from '../utils/validate'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -62,18 +63,13 @@ const form = reactive({
 })
 
 const rules = {
-  phone: [
-    { required: true, message: '请输入手机号', trigger: 'blur' },
-    { pattern: /^1[3-9]\d{9}$/, message: '手机号格式不正确', trigger: 'blur' }
-  ],
-  password: [
-    { required: true, message: '请输入密码', trigger: 'blur' },
-    { min: 6, max: 20, message: '密码长度必须在6-20位之间', trigger: 'blur' }
-  ]
+  phone: [phoneRule],
+  password: [passwordRule]
 }
 
 const handleLogin = async () => {
-  const valid = await formRef.value?.validate().catch(() => false)
+  if (!formRef.value) return
+  const valid = await formRef.value.validate().catch(() => false)
   if (!valid) return
 
   loading.value = true

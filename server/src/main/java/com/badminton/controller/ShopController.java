@@ -1,6 +1,7 @@
 package com.badminton.controller;
 
 import com.badminton.common.Result;
+import com.badminton.annotation.RequireRole;
 import com.badminton.dto.CartItemDTO;
 import com.badminton.dto.OrderCreateDTO;
 import com.badminton.dto.ProductCategoryDTO;
@@ -50,12 +51,14 @@ public class ShopController {
     // ==================== 分类管理 ====================
 
     @Operation(summary = "新增分类")
+    @RequireRole("ADMIN")
     @PostMapping("/categories")
     public Result<Long> createCategory(@Valid @RequestBody ProductCategoryDTO dto) {
         return Result.success(productCategoryService.createCategory(dto));
     }
 
     @Operation(summary = "修改分类")
+    @RequireRole("ADMIN")
     @PutMapping("/categories/{id}")
     public Result<Void> updateCategory(@PathVariable Long id, @Valid @RequestBody ProductCategoryDTO dto) {
         dto.setId(id);
@@ -64,6 +67,7 @@ public class ShopController {
     }
 
     @Operation(summary = "删除分类")
+    @RequireRole("ADMIN")
     @DeleteMapping("/categories/{id}")
     public Result<Void> deleteCategory(@PathVariable Long id) {
         productCategoryService.deleteCategory(id);
@@ -79,12 +83,14 @@ public class ShopController {
     // ==================== 商品管理 ====================
 
     @Operation(summary = "新增SPU")
+    @RequireRole("ADMIN")
     @PostMapping("/products")
     public Result<Long> createSpu(@Valid @RequestBody ProductSpuDTO dto) {
         return Result.success(productService.createSpu(dto));
     }
 
     @Operation(summary = "修改SPU")
+    @RequireRole("ADMIN")
     @PutMapping("/products/{id}")
     public Result<Void> updateSpu(@PathVariable Long id, @Valid @RequestBody ProductSpuDTO dto) {
         dto.setId(id);
@@ -93,6 +99,7 @@ public class ShopController {
     }
 
     @Operation(summary = "删除SPU")
+    @RequireRole("ADMIN")
     @DeleteMapping("/products/{id}")
     public Result<Void> deleteSpu(@PathVariable Long id) {
         productService.deleteSpu(id);
@@ -115,12 +122,14 @@ public class ShopController {
     }
 
     @Operation(summary = "新增SKU")
+    @RequireRole("ADMIN")
     @PostMapping("/skus")
     public Result<Long> createSku(@Valid @RequestBody ProductSkuDTO dto) {
         return Result.success(productService.createSku(dto));
     }
 
     @Operation(summary = "修改SKU")
+    @RequireRole("ADMIN")
     @PutMapping("/skus/{id}")
     public Result<Void> updateSku(@PathVariable Long id, @Valid @RequestBody ProductSkuDTO dto) {
         dto.setId(id);
@@ -129,6 +138,7 @@ public class ShopController {
     }
 
     @Operation(summary = "删除SKU")
+    @RequireRole("ADMIN")
     @DeleteMapping("/skus/{id}")
     public Result<Void> deleteSku(@PathVariable Long id) {
         productService.deleteSku(id);
@@ -211,6 +221,7 @@ public class ShopController {
     }
 
     @Operation(summary = "发货", description = "管理后台使用")
+    @RequireRole("ADMIN")
     @PostMapping("/order/ship/{id}")
     public Result<Void> shipOrder(@PathVariable Long id) {
         shopOrderService.shipOrder(id, "");
@@ -218,6 +229,7 @@ public class ShopController {
     }
 
     @Operation(summary = "全部订单", description = "管理后台使用")
+    @RequireRole("ADMIN")
     @GetMapping("/orders")
     public Result<List<ShopOrderVO>> listAllOrders(@RequestParam(required = false) Integer status) {
         return Result.success(shopOrderService.listAllOrders(status));
